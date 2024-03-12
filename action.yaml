@@ -1,0 +1,26 @@
+---
+name: actions-setup-nodejs
+description: |
+  Sets up a NodeJS environment, checks out the repository, and installs dependencies.
+
+runs:
+  using: composite
+  steps:
+
+    - name: Setup NodeJS 
+      uses: actions/setup-node@v3
+      with:
+        node-version-file: '.nvmrc'
+
+    - name: Cache dependencies
+      id: cache-node-modules
+      uses: actions/cache@v3
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+
+    - name: Install dependencies
+      if: steps.cache-node-modules.outputs.cache-hit != 'true'
+      run: |
+        npm ci
+      shell: bash
